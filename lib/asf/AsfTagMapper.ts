@@ -79,11 +79,11 @@ const asfTagMap: INativeTagMap = {
 
 export class AsfTagMapper extends CommonTagMapper {
 
-  public static toRating(rating: string): IRating {
-
-    return {
-      rating: Number.parseFloat(rating + 1) / 5
-    };
+  public static toRating(rating: string | number): IRating {
+    const value = typeof rating === 'number' ? rating : Number.parseFloat(rating);
+    if (!Number.isFinite(value) || value <= 0)
+      return { rating: undefined };
+    return { rating: value / 99 };
   }
 
   public constructor() {
@@ -105,7 +105,7 @@ export class AsfTagMapper extends CommonTagMapper {
       }
       case 'WM/SharedUserRating': {
         const keys = tag.id.split(':');
-        tag.value = AsfTagMapper.toRating(tag.value as string);
+        tag.value = AsfTagMapper.toRating(tag.value as string | number);
         tag.id = keys[0];
         break;
       }
